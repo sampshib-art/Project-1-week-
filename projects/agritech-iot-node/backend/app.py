@@ -34,12 +34,17 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for Next.js dashboard
+# Restrict CORS to trusted local portfolio origins to block malicious browser scripts
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 
@@ -85,10 +90,41 @@ async def generate_ai_diagnostic(telemetry: dict) -> str:
         logger.error(f"[Intelligence Layer] Ollama connection failed: {e}")
         return "AI_DIAGNOSTIC: Local LLM offline. Action: Check irrigation valves immediately."
 
+def validate_telemetry(packet: dict) -> bool:
+    """Validates the input schema and numeric boundaries of telemetry packets to prevent input injection attacks."""
+    required_keys = {"temperature_c", "soil_moisture_pct", "humidity_pct"}
+    if not required_keys.issubset(packet.keys()):
+        return False
+    try:
+        temp = float(packet["temperature_c"])
+        moisture = float(packet["soil_moisture_pct"])
+        humidity = float(packet["humidity_pct"])
+        
+        # Enforce physical security boundaries (block sensor failures or malicious over/underflows)
+        if not (-50.0 <= temp <= 100.0): return False
+        if not (0.0 <= moisture <= 100.0): return False
+        if not (0.0 <= humidity <= 100.0): return False
+        
+        # Sanitize data types to strict structured values
+        packet["temperature_c"] = round(temp, 2)
+        packet["soil_moisture_pct"] = round(moisture, 2)
+        packet["humidity_pct"] = round(humidity, 2)
+        if "irrigation_relay_active" in packet:
+            packet["irrigation_relay_active"] = bool(packet["irrigation_relay_active"])
+            
+        return True
+    except (ValueError, TypeError):
+        return False
+
 async def route_data(packet: dict):
     """Routes incoming serial packets to SSE queues and flags anomalies to the Intelligence Layer."""
     global last_alert_time
     
+    # 1. Enforce strict input validation to block prompt injection and payload hacking
+    if not validate_telemetry(packet):
+        logger.warning("[Security Ingress] Dropped invalid, corrupted, or out-of-bounds telemetry packet.")
+        return
+        
     # Broadcast raw telemetry to all connected clients
     out_payload = {
         "type": "telemetry",

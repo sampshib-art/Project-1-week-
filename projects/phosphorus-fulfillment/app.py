@@ -3,6 +3,8 @@ import json
 import logging
 import sqlite3
 import os
+import hmac
+import hashlib
 from typing import Dict, List
 import httpx
 from fastapi import FastAPI, Request, status, HTTPException
@@ -18,8 +20,18 @@ logger = logging.getLogger("Phosphorus-Core")
 DB_FILE = "fulfillment.db"
 CONFIG_FILE = "config.json"
 
-# In-memory FIFO queue for thread-safe transaction parsing
-order_queue: asyncio.Queue = asyncio.Queue()
+# In-memory FIFO queue bounded to 100 entries to prevent memory flooding DOS attacks
+order_queue: asyncio.Queue = asyncio.Queue(maxsize=100)
+
+# Load secret webhook signing key
+SECRET_KEY = "phosphorus_secure_secret_token"
+try:
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, "r") as f:
+            cfg = json.load(f)
+            SECRET_KEY = cfg.get("secret_key", SECRET_KEY)
+except Exception as e:
+    logger.error(f"Failed to load secret key: {e}. Using temporary default.")
 
 # Pydantic schema validation for secure ingress inputs
 class OrderRequest(BaseModel):
@@ -180,27 +192,63 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for local console dashboards
+# Restrict CORS to specific local trusted origins to prevent malicious cross-origin scripts
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
 @app.post("/api/order", status_code=status.HTTP_202_ACCEPTED)
-async def create_order(request: OrderRequest):
-    """Ingests order payload, pushes to FIFO queue, and immediately returns 202 Accepted status."""
-    order_data = request.dict()
+async def create_order(request: Request, order_request: OrderRequest):
+    """Ingests order payload, verifies secure HMAC signature, and queues order for fulfillment."""
     
-    # Push to queue to yield context back to client immediately (satisfying under 3s SLA)
-    await order_queue.put(order_data)
+    # 1. Cryptographic HMAC Signature Verification to prevent Webhook Spoofing
+    signature = request.headers.get("X-Signature")
+    if not signature:
+        logger.error("[Ingress Security] Webhook signature missing in headers.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Missing security signature header (X-Signature)."
+        )
+        
+    raw_body = await request.body()
+    computed_signature = hmac.new(
+        SECRET_KEY.encode("utf-8"), 
+        raw_body, 
+        hashlib.sha256
+    ).hexdigest()
+    
+    # Secure constant-time comparison to prevent timing attacks
+    if not hmac.compare_digest(computed_signature, signature):
+        logger.error("[Ingress Security] Invalid webhook signature detected. Rejecting payload.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Invalid signature hash. Unauthorized webhook origin."
+        )
+
+    # 2. Check queue saturation to prevent Out-of-Memory DOS
+    if order_queue.full():
+        logger.error("[Ingress Security] In-memory transaction queue full. Saturated.")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Pipeline queue saturated. Try again later."
+        )
+    
+    # Push validated order object to FIFO Queue
+    await order_queue.put(order_request.dict())
     
     return {
         "status": "QUEUED",
-        "order_id": request.order_id,
-        "message": "Transaction injected into fulfillment worker pipeline."
+        "order_id": order_request.order_id,
+        "message": "Transaction verified and successfully queued."
     }
 
 @app.get("/api/inventory")

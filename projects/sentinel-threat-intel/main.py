@@ -162,8 +162,37 @@ class AIEngine:
     def __init__(self, ollama_url: str):
         self.ollama_url = ollama_url
 
+    def sanitize_payload(self, payload: Dict) -> Dict:
+        """Sanitizes threat data types to prevent prompt injection attacks inside the LLM model."""
+        clean = {}
+        # Sanitize event type string (allow only alphanumeric characters and underscores)
+        raw_type = str(payload.get("type", "UNKNOWN_ANOMALY"))
+        clean["type"] = "".join(c for c in raw_type if c.isalnum() or c in "_-")
+        
+        # Sanitize IP string (allow only digits and dots to prevent command injection or scripts)
+        raw_ip = str(payload.get("source_ip", "0.0.0.0"))
+        clean["source_ip"] = "".join(c for c in raw_ip if c.isdigit() or c == ".")
+        
+        # Enforce strict numeric casts
+        try:
+            if "destination_port" in payload:
+                clean["destination_port"] = int(payload["destination_port"])
+        except (ValueError, TypeError):
+            clean["destination_port"] = 0
+            
+        try:
+            if "event_count" in payload:
+                clean["event_count"] = int(payload["event_count"])
+        except (ValueError, TypeError):
+            clean["event_count"] = 1
+            
+        return clean
+
     async def analyze_threat(self, payload: Dict) -> Dict:
         """Sends the normalized log to Ollama Llama3 for real-time risk classification."""
+        # Sanitize input payload to block prompt injection vectors
+        clean_payload = self.sanitize_payload(payload)
+        
         system_prompt = (
             "You are Sentinel-AI, an automated ICT Security Specialist running on an air-gapped system. "
             "You analyze JSON telemetry logs. Output a strict JSON response containing exactly these fields: "
@@ -173,7 +202,7 @@ class AIEngine:
             "Do not include conversational text, backticks, or markdown formatting."
         )
         
-        prompt = f"System Instruction: {system_prompt}\nTelemetry Log: {json.dumps(payload)}"
+        prompt = f"System Instruction: {system_prompt}\nTelemetry Log: {json.dumps(clean_payload)}"
         
         api_payload = {
             "model": "llama3",
