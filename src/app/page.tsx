@@ -644,122 +644,300 @@ export default function Home() {
   );
 }
 
-// Simulated Sales Dashboard Mock Component for visual impact and context
+// Simulated Multi-Tab Interactive Dashboard Mock Component for visual impact and context
 function DashboardMock({ t, activeTheme }: { t: ThemeStyle; activeTheme: string }) {
   const activeColor = activeTheme === 'white' ? '#ffffff' : activeTheme === 'emerald' ? '#34d399' : activeTheme === 'amber' ? '#fbbf24' : '#22d3ee';
-  
+  const [activeTab, setActiveTab] = useState<'fulfillment' | 'security' | 'agritech'>('fulfillment');
+
   return (
     <div className="w-full bg-black rounded-lg overflow-hidden font-mono text-[10px] md:text-xs select-none">
-      {/* Top simulated window bar */}
-      <div className={`bg-zinc-950 px-4 py-3 border-b ${t.border} flex items-center justify-between transition-colors duration-300`}>
+      {/* Top simulated window bar and interactive tabs */}
+      <div className={`bg-zinc-950 px-4 py-1.5 border-b ${t.border} flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-colors duration-300`}>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-zinc-800"></div>
           <div className="w-2 h-2 rounded-full bg-zinc-800"></div>
           <div className="w-2 h-2 rounded-full bg-zinc-800"></div>
-          <span className="text-zinc-650 ml-2 text-[9px] hidden sm:inline">phosphorus.io/live-analytics</span>
+          <span className="text-zinc-600 ml-2 text-[9px] hidden md:inline">sentinel-console://active-node</span>
         </div>
-        <div className={`flex items-center gap-1.5 text-[9px] ${t.text} bg-zinc-900 px-2 py-0.5 rounded border ${t.border} transition-colors duration-300`}>
-          <span className={`w-1 h-1 rounded-full ${activeTheme === 'white' ? 'bg-white' : activeTheme === 'emerald' ? 'bg-emerald-400 animate-pulse' : activeTheme === 'amber' ? 'bg-amber-400 animate-pulse' : 'bg-cyan-400 animate-pulse'}`}></span>
-          Fulfillment Active
-        </div>
-      </div>
-      
-      {/* Metrics Row */}
-      <div className={`p-3 grid grid-cols-3 gap-2.5 border-b ${t.border} bg-black transition-colors duration-300`}>
-        <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
-          <div className="text-zinc-600 text-[9px] mb-0.5">REVENUE (24H)</div>
-          <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>$1,482.50</div>
-          <div className={`text-[9px] ${t.text} mt-0.5 flex items-center gap-0.5 transition-colors duration-300`}>
-            <span>↑</span> +18.4%
-          </div>
-        </div>
-        <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
-          <div className="text-zinc-600 text-[9px] mb-0.5">FULFILLMENT SLA</div>
-          <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>99.98%</div>
-          <div className="text-[9px] text-zinc-500 mt-0.5">Avg: 1.8s latency</div>
-        </div>
-        <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
-          <div className="text-zinc-600 text-[9px] mb-0.5">AUTO DISPATCHED</div>
-          <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>12,482</div>
-          <div className="text-[9px] text-zinc-400 mt-0.5 flex items-center gap-1">
-            <span className={`w-1 h-1 rounded-full ${activeTheme === 'white' ? 'bg-white' : activeTheme === 'emerald' ? 'bg-emerald-400' : activeTheme === 'amber' ? 'bg-amber-400' : 'bg-cyan-400'}`}></span>
-            Sync OK
-          </div>
+        
+        {/* Dynamic Tab Selectors */}
+        <div className="flex items-center gap-1.5 text-[9px]">
+          {(['fulfillment', 'security', 'agritech'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-2 py-1 border transition-all cursor-pointer rounded uppercase font-bold text-[8px] sm:text-[9px] ${
+                activeTab === tab
+                  ? `${t.text} ${t.border} bg-zinc-900`
+                  : `text-zinc-500 border-transparent hover:text-zinc-350`
+              }`}
+            >
+              [{tab}]
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Analytics Content Block */}
-      <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-3 bg-black">
-        {/* SVG Chart area */}
-        <div className={`bg-black p-2.5 border ${t.border} flex flex-col justify-between h-36 transition-colors duration-300`}>
-          <div className="flex items-center justify-between text-zinc-605 text-[9px] mb-1">
-            <span>TRANSACTION VELOCITY (30D)</span>
-            <span className={`${t.text} transition-colors duration-300`}>12,482 total</span>
+      {/* Render Dynamic View based on Active Tab */}
+      {activeTab === 'fulfillment' && (
+        <>
+          {/* Metrics Row */}
+          <div className={`p-3 grid grid-cols-3 gap-2.5 border-b ${t.border} bg-black transition-colors duration-300`}>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">FULFILLMENT SLA</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>99.98%</div>
+              <div className="text-[8px] text-zinc-550 mt-0.5">Target: &lt; 3.0s delay</div>
+            </div>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">ACTIVE QUEUE</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>0 / 100</div>
+              <div className="text-[8px] text-zinc-500 mt-0.5">Status: Safe</div>
+            </div>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">INGRESS SIGNATURE</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>HMAC-SHA256</div>
+              <div className="text-[8px] text-zinc-500 mt-0.5">Origin Verified</div>
+            </div>
           </div>
-          <div className={`w-full flex-1 flex items-end pt-2 text-white`}>
-            <svg className="w-full h-full" viewBox="0 0 100 30" preserveAspectRatio="none">
-              <path
-                d="M0,28 L5,25 L10,26 Q15,22 20,24 Q25,20 30,15 T40,18 T50,12 T60,16 T70,8 T80,10 T90,3 L100,1 L100,30 L0,30 Z"
-                fill="url(#theme-gradient-mock)"
-                opacity="0.08"
-              />
-              <path
-                d="M0,28 L5,25 L10,26 Q15,22 20,24 Q25,20 30,15 T40,18 T50,12 T60,16 T70,8 T80,10 T90,3 L100,1"
-                fill="none"
-                stroke={activeColor}
-                strokeWidth="1.2"
-                strokeLinecap="round"
-              />
-              <defs>
-                <linearGradient id="theme-gradient-mock" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={activeColor} />
-                  <stop offset="100%" stopColor={activeColor} stopOpacity="0" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div className={`flex justify-between text-zinc-700 text-[8px] mt-1 pt-1 border-t ${t.border} transition-colors duration-300`}>
-            <span>30d ago</span>
-            <span>15d ago</span>
-            <span>Now</span>
-          </div>
-        </div>
 
-        {/* Real-time terminal log feedback */}
-        <div className={`bg-black p-2.5 border ${t.border} h-36 flex flex-col justify-between transition-colors duration-300`}>
-          <div className="text-zinc-600 text-[9px] mb-1 flex items-center justify-between">
-            <span>PIPELINE LOGS</span>
-            <span className="text-[8px] text-zinc-700">LEVEL: SUCCESS</span>
+          {/* Core Analytics Panels */}
+          <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-3 bg-black">
+            {/* SVG Transaction Rate Chart */}
+            <div className={`bg-black p-2.5 border ${t.border} flex flex-col justify-between h-36 transition-colors duration-300`}>
+              <div className="flex items-center justify-between text-zinc-650 text-[8px] sm:text-[9px] mb-1">
+                <span>FULFILLMENT RATE (24H)</span>
+                <span className={`${t.text} transition-colors duration-300`}>Active load</span>
+              </div>
+              <div className="w-full flex-1 flex items-end pt-2">
+                <svg className="w-full h-full" viewBox="0 0 100 30" preserveAspectRatio="none">
+                  <path
+                    d="M0,28 L10,25 L20,27 L30,15 L45,18 L60,10 L75,16 L90,5 L100,2 L100,30 L0,30 Z"
+                    fill="url(#theme-gradient-mock)"
+                    opacity="0.08"
+                  />
+                  <path
+                    d="M0,28 L10,25 L20,27 L30,15 L45,18 L60,10 L75,16 L90,5 L100,2"
+                    fill="none"
+                    stroke={activeColor}
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                  />
+                  <defs>
+                    <linearGradient id="theme-gradient-mock" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={activeColor} />
+                      <stop offset="100%" stopColor={activeColor} stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div className={`flex justify-between text-zinc-700 text-[8px] mt-1 pt-1 border-t ${t.border} transition-colors duration-300`}>
+                <span>12h ago</span>
+                <span>6h ago</span>
+                <span>Now</span>
+              </div>
+            </div>
+
+            {/* Ingress terminal logs */}
+            <div className={`bg-black p-2.5 border ${t.border} h-36 flex flex-col justify-between transition-colors duration-300`}>
+              <div className="text-zinc-600 text-[8px] sm:text-[9px] mb-1 flex items-center justify-between">
+                <span>PHOSPHORUS CONSOLE LOGS</span>
+                <span className="text-[8px] text-zinc-700">STATUS: ACTIVE</span>
+              </div>
+              <div className="flex-1 overflow-hidden space-y-1.5 text-[8px] md:text-[9px] text-zinc-500 font-mono">
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[OK]</span>
+                  <span className="text-zinc-750">03:01:04</span>
+                  <span className="truncate">HMAC Signature check matches for client webhook.</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[DB]</span>
+                  <span className="text-zinc-750">03:01:04</span>
+                  <span className="truncate">BEGIN IMMEDIATE TRANSACTION; Lock acquired.</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-zinc-400">[TX]</span>
+                  <span className="text-zinc-750">03:01:05</span>
+                  <span className="truncate">Stock deducted. Reserved 1 of ITEM_KEY_02.</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[OK]</span>
+                  <span className="text-zinc-750">03:01:05</span>
+                  <span className="truncate">API dispatch delivery handshake successful (SLA: 405ms).</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[OK]</span>
+                  <span className="text-zinc-750">03:01:06</span>
+                  <span className="truncate">COMMIT TRANSACTION; Release write locks.</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex-1 overflow-hidden space-y-1.5 text-[8px] md:text-[9px] text-zinc-500 font-mono">
-            <div className="flex items-center gap-1.5">
-              <span className={`${t.text} transition-colors duration-300`}>[OK]</span>
-              <span className="text-zinc-700">02:14:15</span>
-              <span className="truncate">Auth check: payload signature signature_hash matches.</span>
+        </>
+      )}
+
+      {activeTab === 'security' && (
+        <>
+          {/* Metrics Row */}
+          <div className={`p-3 grid grid-cols-3 gap-2.5 border-b ${t.border} bg-black transition-colors duration-300`}>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">PORT WATCHDOG</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>SECURE</div>
+              <div className="text-[8px] text-zinc-550 mt-0.5">Monitoring Active Sockets</div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className={`${t.text} transition-colors duration-300`}>[OK]</span>
-              <span className="text-zinc-700">02:14:16</span>
-              <span className="truncate">Synced stock level: Item_4922 (Stock: 148).</span>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">ATTACKS BLOCKED</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>1,482</div>
+              <div className="text-[8px] text-zinc-500 mt-0.5">Mock Ingress loop enabled</div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-zinc-400">[TX]</span>
-              <span className="text-zinc-700">02:14:22</span>
-              <span className="truncate">Dispatched license key node pipeline check ok.</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className={`${t.text} transition-colors duration-300`}>[OK]</span>
-              <span className="text-zinc-700">02:14:23</span>
-              <span className="truncate">Completed webhooks to backend master database.</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className={`${t.text} transition-colors duration-300`}>[OK]</span>
-              <span className="text-zinc-700">02:15:01</span>
-              <span className="truncate">Database status OK. Sync completed successfully.</span>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">LOCAL AI DIAGNOSTICS</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>ONLINE</div>
+              <div className="text-[8px] text-zinc-500 mt-0.5">Ollama Llama3 ready</div>
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* Core Analytics Panels */}
+          <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-3 bg-black">
+            {/* Threat graph activity */}
+            <div className={`bg-black p-2.5 border ${t.border} flex flex-col justify-between h-36 transition-colors duration-300`}>
+              <div className="flex items-center justify-between text-zinc-650 text-[8px] sm:text-[9px] mb-1">
+                <span>SYSTEM THREAT ANOMALIES</span>
+                <span className="text-zinc-600">Events/Sec</span>
+              </div>
+              <div className="w-full flex-1 flex items-end pt-2">
+                <svg className="w-full h-full" viewBox="0 0 100 30" preserveAspectRatio="none">
+                  <path
+                    d="M0,28 L20,28 L35,28 L40,10 L45,28 L60,28 L70,5 L75,28 L90,28 L100,28 L100,30 L0,30 Z"
+                    fill="url(#theme-gradient-mock)"
+                    opacity="0.08"
+                  />
+                  <path
+                    d="M0,28 L20,28 L35,28 L40,10 L45,28 L60,28 L70,5 L75,28 L90,28 L100,28"
+                    fill="none"
+                    stroke={activeColor}
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <div className={`flex justify-between text-zinc-700 text-[8px] mt-1 pt-1 border-t ${t.border} transition-colors duration-300`}>
+                <span>Anomaly spikes</span>
+              </div>
+            </div>
+
+            {/* AI mitigation alerts output */}
+            <div className={`bg-black p-2.5 border ${t.border} h-36 flex flex-col justify-between transition-colors duration-300`}>
+              <div className="text-zinc-600 text-[8px] sm:text-[9px] mb-1 flex items-center justify-between">
+                <span>SENTINEL AI CONSOLE ALERT</span>
+                <span className="text-red-500 font-bold">WARNING</span>
+              </div>
+              <div className="flex-1 overflow-hidden space-y-1 text-[7px] sm:text-[8px] font-mono text-zinc-400">
+                <div className="border border-red-900 bg-red-950/15 p-1 rounded">
+                  <div className="text-red-500 font-bold">CRITICAL: BRUTE_FORCE_ATTACK_SUSPECTED</div>
+                  <div className="text-[7px] text-zinc-500">Source: 185.220.101.65 (Failed Logins: 5)</div>
+                  <div className="text-[7px] text-zinc-400 mt-1">
+                    <span className="text-zinc-550 font-bold">AI Mitigation:</span> Dynamic firewall quarantine. Executing: sudo ufw insert 1 deny from 185.220.101.65
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-zinc-600 mt-1">
+                  <span>[INFO]</span>
+                  <span>03:04:16</span>
+                  <span className="truncate">Discord webhook alert completed successfully.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeTab === 'agritech' && (
+        <>
+          {/* Metrics Row */}
+          <div className={`p-3 grid grid-cols-3 gap-2.5 border-b ${t.border} bg-black transition-colors duration-300`}>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">SOIL MOISTURE</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>34.2%</div>
+              <div className="text-[8px] text-zinc-550 mt-0.5">GP26 ADC Channel 0</div>
+            </div>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">VALVE SOLENOID</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>CLOSED</div>
+              <div className="text-[8px] text-zinc-550 mt-0.5">Relay GP15: LOW</div>
+            </div>
+            <div className={`bg-black p-2.5 border ${t.border} transition-colors duration-300`}>
+              <div className="text-zinc-650 text-[8px] sm:text-[9px] mb-0.5">AIR TEMPERATURE</div>
+              <div className={`text-xs md:text-sm font-semibold ${t.text} transition-colors duration-300`}>22.4°C</div>
+              <div className="text-[8px] text-zinc-500 mt-0.5">Internal ADC Channel 4</div>
+            </div>
+          </div>
+
+          {/* Core Analytics Panels */}
+          <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-3 bg-black">
+            {/* Soil moisture sawtooth graph */}
+            <div className={`bg-black p-2.5 border ${t.border} flex flex-col justify-between h-36 transition-colors duration-300`}>
+              <div className="flex items-center justify-between text-zinc-650 text-[8px] sm:text-[9px] mb-1">
+                <span>SOIL MOISTURE DECAY VECTOR</span>
+                <span className="text-zinc-600">Sawtooth Decay</span>
+              </div>
+              <div className="w-full flex-1 flex items-end pt-2">
+                <svg className="w-full h-full" viewBox="0 0 100 30" preserveAspectRatio="none">
+                  {/* Soil moisture decay and instantaneous irrigation resetting sawtooth */}
+                  <path
+                    d="M0,5 L10,12 L20,18 L30,28 L30,5 L45,14 L60,20 L75,28 L75,5 L90,12 L100,18 L100,30 L0,30 Z"
+                    fill="url(#theme-gradient-mock)"
+                    opacity="0.08"
+                  />
+                  <path
+                    d="M0,5 L10,12 L20,18 L30,28 L30,5 L45,14 L60,20 L75,28 L75,5 L90,12 L100,18"
+                    fill="none"
+                    stroke={activeColor}
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <div className={`flex justify-between text-zinc-700 text-[8px] mt-1 pt-1 border-t ${t.border} transition-colors duration-300`}>
+                <span>Irrigation resets (15% limit)</span>
+              </div>
+            </div>
+
+            {/* MicroPython hardware logs */}
+            <div className={`bg-black p-2.5 border ${t.border} h-36 flex flex-col justify-between transition-colors duration-300`}>
+              <div className="text-zinc-600 text-[8px] sm:text-[9px] mb-1 flex items-center justify-between">
+                <span>RP2040 FIRMWARE LOGS</span>
+                <span className="text-[8px] text-zinc-700">CORE: 133MHz</span>
+              </div>
+              <div className="flex-1 overflow-hidden space-y-1.5 text-[8px] md:text-[9px] text-zinc-500 font-mono">
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[PICO]</span>
+                  <span className="text-zinc-700">Ticks: 88201</span>
+                  <span className="truncate">Sample ADC4 average reading: 41295 (Scaled: 2.08V)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[PICO]</span>
+                  <span className="text-zinc-700">Ticks: 90201</span>
+                  <span className="truncate">Calculated internal temp: 22.41C</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-zinc-400">[WARN]</span>
+                  <span className="text-zinc-700">Ticks: 92201</span>
+                  <span className="truncate">Moisture: 14.8% &lt; threshold. Actuate irrigation valve GP15!</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[PICO]</span>
+                  <span className="text-zinc-700">Ticks: 92205</span>
+                  <span className="truncate">Drive GP15 pin HIGH. Solenoid RELAY closed.</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`${t.text} transition-colors duration-300`}>[PICO]</span>
+                  <span className="text-zinc-700">Ticks: 94201</span>
+                  <span className="truncate">Moisture reset to 85.0%. Drive GP15 pin LOW.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
