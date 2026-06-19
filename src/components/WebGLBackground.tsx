@@ -23,7 +23,7 @@ function SceneNode({ color = "#ffffff" }: { color?: string }) {
   const lastProgressRef = useRef<number>(-1);
   const { scrollYProgress } = useMotionScroll();
 
-  useFrame(() => {
+  useFrame((state) => {
     if (groupRef.current) {
       const progress = scrollYProgress.get();
 
@@ -31,20 +31,26 @@ function SceneNode({ color = "#ffffff" }: { color?: string }) {
       if (progress === lastProgressRef.current) return;
       lastProgressRef.current = progress;
 
-      // Parent group: general scroll-bound rotation and downward parallax translation
-      groupRef.current.rotation.x = progress * ROT_X_FACTOR;
-      groupRef.current.rotation.y = progress * ROT_Y_FACTOR;
-      groupRef.current.position.y = POS_Y_START - progress * POS_Y_FACTOR;
+      // 1. Animate Camera Position & LookAt (The Hardware Dive)
+      // Zooms in, sweeps side-to-side on a sine wave, and pans down
+      state.camera.position.z = 5.5 - progress * 3.7;
+      state.camera.position.x = Math.sin(progress * Math.PI) * 1.8;
+      state.camera.position.y = 1.0 - progress * 2.5;
+      state.camera.lookAt(0, 0, 0);
+
+      // 2. Rotate the parent group to match
+      groupRef.current.rotation.y = progress * Math.PI * 1.5;
+      groupRef.current.rotation.x = progress * Math.PI * 0.5;
 
       // Kinetic layers: spin sub-systems at different velocities to create mechanical complexity
       if (coreRef.current) {
         coreRef.current.rotation.y = -progress * Math.PI * 1.0;
       }
       if (planesRef.current) {
-        planesRef.current.rotation.z = progress * Math.PI * 0.5;
+        planesRef.current.rotation.z = progress * Math.PI * 0.8;
       }
       if (nodesRef.current) {
-        nodesRef.current.rotation.y = progress * Math.PI * 3.0;
+        nodesRef.current.rotation.y = progress * Math.PI * 2.0;
       }
     }
   });
