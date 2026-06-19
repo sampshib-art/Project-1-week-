@@ -304,7 +304,7 @@ class Dispatcher:
 
 async def main():
     print(f"\n{COLOR_CYAN}{COLOR_BOLD}=== SENTINEL THREAT INTELLIGENCE DAEMON SYSTEM LAUNCH ==={COLOR_RESET}")
-    print(f"{COLOR_CYAN}Targeting NZ ANZSCO 262112 (ICT Security Specialist) Core Metrics{COLOR_RESET}\n")
+    print(f"{COLOR_CYAN}Initializing Local Socket Watchdog & Threat Diagnostic Engine{COLOR_RESET}\n")
 
     # Load Configs
     config = Configuration("config.json")

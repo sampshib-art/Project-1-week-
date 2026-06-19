@@ -2,7 +2,7 @@
 
 This is the absolute architectural blueprint of the **Sentinel Threat Intel Daemon**. The system operates as an air-gapped, low-overhead background security agent designed to ingest local system logs and network connection telemetry, filter activities through a deterministic rules engine, classify threat vectors utilizing a local Large Language Model (Ollama Llama3), and dispatch real-time alerts to a security dashboard or notification channel.
 
-This project is engineered to demonstrate applied system-level programming, concurrent event tracking, offline AI pipeline orchestration, and network security analysis. This system aligns directly with the competencies required for the **ICT Security Specialist (ANZSCO 262112)** and **Software Engineer (ANZSCO 261313)** tracks under the New Zealand Tier 1 Green List.
+This project was built out of a genuine interest in systems security and local AI integration. It proves how lightweight background daemons can monitor system calls, detect anomalies, and utilize offline AI engines for real-time risk assessment without relying on cloud services.
 
 ---
 
@@ -25,69 +25,91 @@ The Sentinel Daemon is structured as a decoupled, event-driven unidirectional da
 
 ---
 
-## Core Computational Layers
+## Real-World Utility (How It's Useful IRL)
 
-### Layer 1: System Telemetry Ingestion (Low-Level Collector)
-The daemon binds to local operating system telemetry using cross-platform hooks:
-*   **Network Socket Probe**: Continuous polling of active network connection states via the operating system's raw sockets (using `psutil.net_connections`). It tracks outbound TCP connections, established ports, and flags rapid port-binding activities indicating scanning behavior.
-*   **System Event Log Hook**: Monitors authentication failure rates (such as Windows Event ID 4625 for failed logins or standard Unix syslog `/var/log/auth.log` records) to detect active brute-force vectors.
+In a production environment, this daemon serves as a **Host-Based Intrusion Detection and Prevention System (HIDS/HIPS)**. 
 
-### Layer 2: Normalization & In-Memory Rules Aggregator
-Raw OS connection logs and events are normalized into a unified, standard schema. An in-memory state engine tracks activities over a rolling time window:
-*   **Aggregator Gates**: Prevents AI inference queue thrashing by gating alerts. For instance, multiple failed logins from the same source IP are aggregated over a 15-second window. Only when the count exceeds `3` attempts does the pipeline escalate the event.
-*   **Threat Data Packetization**: Constructs a normalized context payload:
-    ```json
-    {
-      "source_ip": "192.168.1.45",
-      "destination_port": 22,
-      "event_type": "FAILED_AUTHENTICATION_EXCEEDED",
-      "event_count": 5,
-      "time_window_seconds": 15,
-      "target_system": "local_host"
-    }
-    ```
-
-### Layer 3: Local AI Intelligence Layer (Offline Llama3)
-Instead of relying on rigid, static regex rules to assess complex threat behaviors, the system uses a localized Large Language Model (Ollama Llama3) running completely offline on the host hardware:
-*   **Context Isolation**: The payload is embedded into a strict system instruction context.
-*   **System Prompting**:
-    > "You are Sentinel-AI, an automated ICT Security Specialist running on an air-gapped system. You analyze JSON telemetry logs. Output a strict JSON response containing: 1. 'threat_level' (LOW, MEDIUM, HIGH, CRITICAL), 2. 'attack_vector' (a 2-word classification), and 3. 'mitigation_step' (a concise, 1-sentence technical instruction). Do not include conversational text or fluff."
-*   **Inference Endpoint**: An asynchronous HTTP POST client executes the request to `http://localhost:11434/api/generate` and parses the response.
-
-### Layer 4: Dispatcher Layer (Webhooks & Console)
-Once the local LLM generates the threat report, the dispatcher formats a rich message containing:
-*   Color-coded embeds matching the threat level (Red for `CRITICAL`, Orange for `HIGH`, Green for `LOW`).
-*   The exact source IP, ports targeted, and local AI mitigation steps.
-*   A REST payload sent to the configured Discord Webhook or logged to the secure local dashboard stream.
+Unlike traditional static security scanners (which can only trigger alerts based on rigid, pre-defined rules), Sentinel leverages a local Large Language Model to:
+1.  **Understand Intent**: Distinguish between an administrator who forgot their password (low threat) and a coordinated automated script doing brute-force password spraying (high threat).
+2.  **Generate Tailored Mitigation Steps**: The AI dynamically assesses what service is under attack (e.g. database port vs. web application port) and recommends the exact technical command to isolate the system.
+3.  **Perform Automated Firewall Containment**: The dispatcher can be configured to run local shell commands (like `ufw block from <ip>` on Linux or Windows Advanced Firewall commands) to dynamically quarantine attackers in under 3 seconds.
 
 ---
 
-## Installation & Setup
+## Operational Scenarios & Anomalies
 
-### Prerequisites
-*   Python 3.10+
-*   Local Ollama installation with the `llama3` model pulled (`ollama pull llama3`)
+The daemon checks for multiple security vectors:
+*   **Brute-Force Detection**: Counts sequential authentication failures. If an IP exceeds `3` failures within `15` seconds, the Rules Engine flags it as a `BRUTE_FORCE_ATTACK_SUSPECTED`.
+*   **Unmapped Socket Detection**: Monitors active TCP/UDP connections. If an outbound connection is established on a high-risk administrative port (such as `22` for SSH, `3389` for RDP, or databases like `3306` for MySQL) from an untrusted subnet, it triggers an instant anomaly report.
 
-### Installation Steps
-1.  Clone the repository and navigate to the project directory:
+---
+
+## Production Deployment & Integration (Real Hardware & OS)
+
+### 1. Connecting to Real Operating System Logs
+In the default testing setup, the script runs a mock log generator to make it easy to test. In a production Linux deployment:
+*   **Tail the Syslog**: Replace the simulated log loop in [main.py](file:///D:/Project%201%20week/projects/sentinel-threat-intel/main.py) with an active log tailer using Python's `subprocess` or `select` module on `/var/log/auth.log` (Debian/Ubuntu) or `/var/log/secure` (RedHat/CentOS).
+    ```python
+    # Example production log watcher snippet
+    def tail_auth_log():
+        with open("/var/log/auth.log", "r") as f:
+            f.seek(0, 2)  # Go to end of file
+            while True:
+                line = f.readline()
+                if "Failed password" in line:
+                    # Parse attacker IP and add to cache
+                    process_failed_attempt(line)
+  ```
+
+### 2. Enabling Automated Active Response (Firewall Block)
+To upgrade the system from an *Intrusion Detection System (IDS)* to an *Intrusion Prevention System (IPS)*, you can uncomment or add a command dispatcher that dynamically blocks the IP address:
+```python
+# Real-world dynamic firewall block dispatching
+import subprocess
+
+def quarantine_attacker_ip(attacker_ip: str):
+    logger.warning(f"Isolating host: {attacker_ip} via local UFW firewall rules.")
+    # Execute OS level firewall rule
+    subprocess.run(["sudo", "ufw", "insert", "1", "deny", "from", attacker_ip], check=True)
+```
+
+### 3. Deploying as a 24/7 System Service (systemd)
+To ensure the daemon runs continuously in the background on your server:
+1.  Create a service configuration file at `/etc/systemd/system/sentinel-security.service`:
+    ```ini
+    [Unit]
+    Description=Sentinel Threat Intel Local Security Daemon
+    After=network.target
+
+    [Service]
+    Type=simple
+    User=root
+    WorkingDirectory=/opt/sentinel-threat-intel
+    ExecStart=/usr/bin/python3 /opt/sentinel-threat-intel/main.py
+    Restart=on-failure
+    RestartSec=5
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+2.  Enable and start the service:
     ```bash
-    cd projects/sentinel-threat-intel
+    sudo systemctl daemon-reload
+    sudo systemctl enable sentinel-security.service
+    sudo systemctl start sentinel-security.service
     ```
-2.  Install dependencies:
-    ```bash
-    pip install psutil httpx
-    ```
-3.  Configure your credentials:
-    Create a `config.json` inside the project root:
-    ```json
-    {
-      "discord_webhook_url": "YOUR_DISCORD_WEBHOOK_URL_HERE",
-      "ollama_api_url": "http://localhost:11434/api/generate",
-      "poll_interval_seconds": 5.0,
-      "failed_login_threshold": 3
-    }
-    ```
-4.  Run the security daemon:
-    ```bash
-    python main.py
-    ```
+
+---
+
+## Local Configuration (`config.json`)
+
+Configure your logging preferences and integration links:
+```json
+{
+  "discord_webhook_url": "YOUR_DISCORD_WEBHOOK_URL_HERE",
+  "ollama_api_url": "http://localhost:11434/api/generate",
+  "poll_interval_seconds": 5.0,
+  "failed_login_threshold": 3
+}
+```
+*(Leave `discord_webhook_url` empty to log alerts locally to the console).*
