@@ -406,7 +406,7 @@ export default function Home() {
             </div>
             
             <p className={`text-sm md:text-base ${t.textMuted} leading-relaxed font-light max-w-xl font-mono transition-colors duration-300`}>
-              Operating close to the hardware. Specializing in low-latency execution loops, physical HID hardware scripting, and custom AI pipeline orchestration. Relocating to New Zealand to study AI & Computer Science.
+              Operating close to the hardware. Specializing in low-latency execution loops, physical HID hardware scripting, and custom AI pipeline orchestration. Building autonomous agent networks and custom hardware kernels.
             </p>
             
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
@@ -501,7 +501,7 @@ export default function Home() {
 
           {/* 3. Technical Projects Grid */}
           <section ref={projectsRef} id="projects" className="space-y-8 scroll-mt-24 font-mono">
-            <SectionHeader num="03" title="REPOS: BACHELOR'S LEVEL STATE-OF-PURPOSE DEVELOPMENT CORE" t={t} />
+            <SectionHeader num="03" title="REPOS: SYSTEM AUTOMATION & AI DEVELOPMENT CORE" t={t} />
 
             <div className={`border-t ${t.border} flex flex-col w-full`}>
               {[
@@ -631,7 +631,7 @@ export default function Home() {
         <div className={`w-full max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-[10px] ${t.textMuted} transition-colors duration-300`}>
           <div>
             <span>© {new Date().getFullYear()} {PORTFOLIO_CONFIG.name.toUpperCase()}.</span>
-            <span className="hidden sm:inline"> System Hacker & AI Infrastructure Engineer. New Zealand Bound.</span>
+            <span className="hidden sm:inline"> System Hacker & AI Infrastructure Engineer. Offline Intelligent Nodes.</span>
           </div>
           <div className="flex items-center gap-4">
             <a href={PORTFOLIO_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300 transition-colors">GitHub</a>
