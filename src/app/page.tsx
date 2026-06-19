@@ -521,10 +521,10 @@ export default function Home() {
                 },
                 { 
                   num: "03", 
-                  title: "LUA_STATE_HOOKING_ENGINE", 
-                  tech: "Lua / C / Memory Assembly",
-                  desc: "Memory scanning and application hooking tool that reads local application address buffers to intercept execution loops and inject performance macros.",
-                  focus: "Pointer offsets, memory layout analysis, binary hooking"
+                  title: "PHOSPHORUS_FULFILLMENT", 
+                  tech: "Python / Asyncio / SQLite Concurrency",
+                  desc: "Open-source high-throughput API engine integrating SQLite transaction locks and asynchronous queue workers to execute secure digital asset transfers under a 3s SLA.",
+                  focus: "Double-sell prevention, FIFO serialization queue, database transaction locks"
                 },
                 { 
                   num: "04", 
