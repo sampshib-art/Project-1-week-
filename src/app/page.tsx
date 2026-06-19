@@ -42,7 +42,7 @@ function Github({ size = 18, className = "" }: { size?: number; className?: stri
 
 const PORTFOLIO_CONFIG = {
   name: "Sampanna Shibabhakti",
-  githubUrl: "https://github.com/your-username", 
+  githubUrl: "https://github.com/sampshib-art", 
   email: "sampanna@example.com", 
 };
 
