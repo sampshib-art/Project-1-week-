@@ -1,5 +1,5 @@
 {
-  "discord_webhook_url": "",
+  "discord_webhook_url": "YOUR_DISCORD_WEBHOOK_URL_HERE",
   "ollama_api_url": "http://localhost:11434/api/generate",
   "poll_interval_seconds": 5.0,
   "failed_login_threshold": 3

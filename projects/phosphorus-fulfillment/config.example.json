@@ -1,0 +1,6 @@
+{
+  "database_path": "fulfillment.db",
+  "max_retries": 3,
+  "callback_webhook_url": "",
+  "secret_key": "YOUR_SECRET_WEBHOOK_VERIFICATION_TOKEN_HERE"
+}

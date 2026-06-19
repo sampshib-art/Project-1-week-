@@ -1,5 +1,0 @@
-{
-  "database_path": "fulfillment.db",
-  "max_retries": 3,
-  "callback_webhook_url": ""
-}
