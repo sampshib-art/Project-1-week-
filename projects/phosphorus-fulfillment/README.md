@@ -114,3 +114,26 @@ COMMIT;
       }
     ]
     ```
+
+---
+
+## Security Audit & Threat Modeling (IRL Vulnerability Analysis)
+
+Because digital storefront fulfillment processes sensitive financial transactions and valuable assets, a naive "vibe-coded" script would be heavily vulnerable to exploits. Below is an audit of potential security vulnerabilities in this architecture and how Phosphorus defends against them:
+
+### 1. Webhook Spoofing (Exploit: Free Assets)
+*   **The Exploit**: Since `/api/order` is a public HTTP endpoint, an attacker could scan your server, find the endpoint, and send custom POST requests directly to it (e.g. ordering 100 keys for free, bypassing payment gates entirely).
+*   **The Defense (HMAC Verification)**: In a production setup, you must implement signature validation. The storefront (e.g., Eldorado) signs the JSON body using a shared secret token via `HMAC-SHA256` and sends the signature in the request headers (`X-Signature`). Phosphorus verifies this signature before processing the request, rejecting any unsigned or modified packets.
+
+### 2. Replay Attacks (Exploit: Inventory Depletion)
+*   **The Exploit**: An attacker intercepts a legitimate webhook payload from a successful purchase and sends it to the server multiple times. Without verification, the server would fulfill the order repeatedly, draining your stock.
+*   **The Defense (Unique Transaction Keys)**: In [app.py](file:///D:/Project%201%20week/projects/phosphorus-fulfillment/app.py), the SQLite database enforces a `PRIMARY KEY` constraint on the `transactions` table using `TXN-{order_id}`. If an order is replayed, the database throws a duplicate key exception, and the transaction is aborted before stock is deducted.
+
+### 3. Queue Exhaustion (Exploit: Out-of-Memory DOS)
+*   **The Exploit**: An attacker fires millions of rapid POST requests to `/api/order`. Because Python's `asyncio.Queue` is unbounded in memory by default, the queue size will grow until the host machine runs out of RAM, crashing the server.
+*   **The Defense (Queue Bounding & Rate Limiting)**: Implement rate limiting on the ingress router (e.g. limiting requests to 20/sec per IP using token-bucket checks) and restrict the queue capacity (e.g. `asyncio.Queue(maxsize=1000)`). When the queue is full, the server returns an HTTP `503 Service Unavailable` response, protecting server resources.
+
+### 4. SQL Injection (Exploit: Database Theft)
+*   **The Exploit**: If input variables like `asset_id` were concatenated directly into query strings (e.g., `f"SELECT * FROM inventory WHERE asset_id = '{asset_id}'"`), an attacker could send a payload containing `'; DROP TABLE inventory; --` to delete the database.
+*   **The Defense (Parameterized Queries)**: Phosphorus uses strict SQL parameterization (`cursor.execute("SELECT ... WHERE asset_id = ?;", (asset_id,))`). This forces the database engine to treat user input strictly as text parameters, not executable code.
+
