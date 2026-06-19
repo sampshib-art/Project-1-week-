@@ -514,10 +514,10 @@ export default function Home() {
                 },
                 { 
                   num: "02", 
-                  title: "HARDWARE_HID_INJECTION", 
-                  tech: "CircuitPython / C++ / Pi Pico",
-                  desc: "Physical human interface device (HID) automation payload injector engineered with Raspberry Pi Pico microcontrollers to run automated hardware diagnosis scripts.",
-                  focus: "Low-level microcontrollers, raw descriptor mapping, keyboard/mouse emulation"
+                  title: "SENTINEL_THREAT_INTEL", 
+                  tech: "Python / Local Llama / System Sockets",
+                  desc: "Autonomous background security daemon scanning network socket states and local authentication logs to trigger offline LLM threat analysis and Discord webhook alerts.",
+                  focus: "System socket monitoring, threat classification, offline AI agent loops"
                 },
                 { 
                   num: "03", 
