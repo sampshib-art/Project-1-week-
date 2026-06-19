@@ -13,7 +13,26 @@ from fastapi.responses import StreamingResponse
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("agritech-backend")
 
-app = FastAPI(title="Agritech IoT Telemetry Ingestion Node", version="1.0.0")
+from contextlib import asynccontextmanager
+
+# Define lifespan event handler for startup/shutdown tasks
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Launch the serial telemetry reader background task
+    task = asyncio.create_task(serial_polling_loop())
+    yield
+    # Shutdown: Cancel background tasks
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+
+app = FastAPI(
+    title="Agritech IoT Telemetry Ingestion Node", 
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 # Enable CORS for Next.js dashboard
 app.add_middleware(
@@ -115,7 +134,7 @@ async def serial_polling_loop():
         import serial
         serial_available = True
     except ImportError:
-        logger.warn("[Ingestion Backend] 'pyserial' package missing. Operating in Mock Hardware mode.")
+        logger.warning("[Ingestion Backend] 'pyserial' package missing. Operating in Mock Hardware mode.")
 
     while True:
         if serial_available:
@@ -179,10 +198,7 @@ async def mock_telemetry_loop():
         await route_data(payload)
         await asyncio.sleep(2.0)
 
-@app.on_event("startup")
-async def startup_event():
-    """Launches the serial telemetry reader background worker."""
-    asyncio.create_task(serial_polling_loop())
+# Lifespan handles the startup cycle now; deprecated startup decorator is removed.
 
 @app.get("/api/telemetry")
 async def get_telemetry_stream(request: Request):

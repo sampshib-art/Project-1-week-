@@ -24,12 +24,20 @@ def gaussian_noise(mean=0.0, std_dev=1.0):
 
 while True:
     try:
-        # 1. Analog-to-Digital Conversion (12-bit scaled to 16-bit)
-        reading = temp_sensor.read_u16()
+        # 1. Analog-to-Digital Conversion with 10-sample oversampling filter
+        total_reading = 0
+        for _ in range(10):
+            total_reading += temp_sensor.read_u16()
+            time.sleep_ms(5)  # Short settling delay
+        reading = total_reading / 10.0
         
         # Scale to voltage: 0-65535 reading represents 0-3.3V
         voltage = (reading / 65535.0) * 3.3
         
+        # Validate raw sensor bounds (e.g. detect short-circuits or disconnected pins)
+        if voltage < 0.1 or voltage > 3.2:
+            raise ValueError("ADC sensor voltage out of physical range (0.1V - 3.2V)")
+            
         # Translate voltage to Celsius using RP2040 datasheet specifications:
         # Vtemp = 0.706V at 27 degrees C, slope = -1.721mV per degree C
         temperature_c = 27.0 - ((voltage - 0.706) / 0.001721)
