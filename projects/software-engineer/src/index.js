@@ -1,0 +1,1 @@
+console.log("Starting Micro-Frontend Architecture (Software Engineer)...");

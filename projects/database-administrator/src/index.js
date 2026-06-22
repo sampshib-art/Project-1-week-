@@ -1,0 +1,1 @@
+console.log("Starting High-Availability Database Cluster (Database Administrator)...");
