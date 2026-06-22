@@ -1,45 +1,26 @@
 # High-Availability Database Cluster (Database Administrator)
 
-This is the absolute architectural blueprint of the **High-Availability Database Cluster (Database Administrator)**.
+This is the architectural blueprint of the **High-Availability Database Cluster (Database Administrator)**.
 
-A distributed database clustering solution ensuring 99.999% uptime. Features include automated failover, real-time replication, and query optimization tools for large-scale enterprise data.
+A distributed database clustering solution ensuring 99.999% uptime.
 
-This project was built to explore the boundaries of enterprise architecture and modern software engineering. It showcases how developers can bridge complex business requirements with cutting-edge technology.
-
----
-
-## System Architecture
-
-The system operates as a decoupled architecture divided into computational layers:
-
-```
-[ Client Layer ]
-          │
-          ▼ 
-[ API Gateway / Load Balancer ]
-          │
-          ├──► [ Processing Services ]
-          │
-          ▼ 
-[ Persistent Storage / Database ]
-```
+This project bridges theoretical software engineering with physical hardware implementation, demonstrating real-world utility.
 
 ---
 
-## Real-World Utility (How It's Useful IRL)
-
-In commercial applications, this system allows for:
-1.  **High-Frequency Processing**: Reacting to data streams in real-time.
-2.  **Safety & Reliability**: Automated fallbacks and fault tolerance.
-3.  **Scalability**: Independent scaling of system components.
+## Physical Hardware Wiring & Setup
+This requires at least 3 physical bare-metal servers and a NAS array.
+1. Connect the NAS to the servers using a dedicated 10GbE SFP+ switch (Storage Area Network).
+2. Configure hardware RAID 10 on the NAS for redundancy.
+3. Ensure each server has dual redundant power supplies connected to separate UPS units.
 
 ---
 
-## Setup & Configuration
+## Simulation Code
 
-Start the backend server to listen for requests:
+If you do not have the physical hardware, you can run the software simulation layer to mock the data streams and verify the logic.
+
 ```bash
-cd projects/database-administrator/src
-npm install
-npm start
+cd projects/database-administrator/simulation
+node sim.js  # Or python sim.py
 ```

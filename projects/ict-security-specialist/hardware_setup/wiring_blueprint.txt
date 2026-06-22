@@ -1,0 +1,5 @@
+## Physical Hardware Wiring & Setup
+Integrate a Hardware Security Module (HSM) such as a YubiHSM 2.
+1. Insert the YubiHSM 2 into the central authentication server USB port.
+2. Wire a physical biometric access panel (e.g., fingerprint scanner) to the entry gate using Wiegand protocol wiring.
+3. The proxy server will reject all network requests unless the physical biometric log matches the cryptographic token signed by the HSM.

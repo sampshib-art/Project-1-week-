@@ -1,45 +1,27 @@
 # Distributed Analytics Engine (Analyst Programmer)
 
-This is the absolute architectural blueprint of the **Distributed Analytics Engine (Analyst Programmer)**.
+This is the architectural blueprint of the **Distributed Analytics Engine (Analyst Programmer)**.
 
-A high-throughput distributed analytics engine built for processing real-time financial market data. It uses Kafka for streaming and a decoupled microservices architecture to provide predictive insights.
+A high-throughput distributed analytics engine built for processing real-time financial market data.
 
-This project was built to explore the boundaries of enterprise architecture and modern software engineering. It showcases how developers can bridge complex business requirements with cutting-edge technology.
-
----
-
-## System Architecture
-
-The system operates as a decoupled architecture divided into computational layers:
-
-```
-[ Client Layer ]
-          │
-          ▼ 
-[ API Gateway / Load Balancer ]
-          │
-          ├──► [ Processing Services ]
-          │
-          ▼ 
-[ Persistent Storage / Database ]
-```
+This project bridges theoretical software engineering with physical hardware implementation, demonstrating real-world utility.
 
 ---
 
-## Real-World Utility (How It's Useful IRL)
-
-In commercial applications, this system allows for:
-1.  **High-Frequency Processing**: Reacting to data streams in real-time.
-2.  **Safety & Reliability**: Automated fallbacks and fault tolerance.
-3.  **Scalability**: Independent scaling of system components.
+## Physical Hardware Wiring & Setup
+To build this locally, set up a 4-node Raspberry Pi 4 cluster connected via a Gigabit network switch. 
+1. Flash Ubuntu Server on 4 microSD cards.
+2. Connect each Pi to the Gigabit switch using CAT6 Ethernet cables.
+3. Configure static IPs for inter-node communication.
+4. Deploy Kafka brokers on nodes 1-3, and the analytics consumer on node 4.
 
 ---
 
-## Setup & Configuration
+## Simulation Code
 
-Start the backend server to listen for requests:
+If you do not have the physical hardware, you can run the software simulation layer to mock the data streams and verify the logic.
+
 ```bash
-cd projects/analyst-programmer/src
-npm install
-npm start
+cd projects/analyst-programmer/simulation
+node sim.js  # Or python sim.py
 ```

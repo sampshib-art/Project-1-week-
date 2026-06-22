@@ -1,45 +1,26 @@
 # Enterprise IT Governance Framework (Chief Information Officer)
 
-This is the absolute architectural blueprint of the **Enterprise IT Governance Framework (Chief Information Officer)**.
+This is the architectural blueprint of the **Enterprise IT Governance Framework (Chief Information Officer)**.
 
-An automated compliance and IT governance dashboard. It aggregates security metrics, infrastructure costs, and deployment frequencies to provide a unified executive dashboard for strategic decision-making.
+An automated compliance and IT governance dashboard.
 
-This project was built to explore the boundaries of enterprise architecture and modern software engineering. It showcases how developers can bridge complex business requirements with cutting-edge technology.
-
----
-
-## System Architecture
-
-The system operates as a decoupled architecture divided into computational layers:
-
-```
-[ Client Layer ]
-          │
-          ▼ 
-[ API Gateway / Load Balancer ]
-          │
-          ├──► [ Processing Services ]
-          │
-          ▼ 
-[ Persistent Storage / Database ]
-```
+This project bridges theoretical software engineering with physical hardware implementation, demonstrating real-world utility.
 
 ---
 
-## Real-World Utility (How It's Useful IRL)
-
-In commercial applications, this system allows for:
-1.  **High-Frequency Processing**: Reacting to data streams in real-time.
-2.  **Safety & Reliability**: Automated fallbacks and fault tolerance.
-3.  **Scalability**: Independent scaling of system components.
+## Physical Hardware Wiring & Setup
+Connect physical SNMP environmental sensors (temperature/humidity) located in the server rack to the governance node.
+1. Wire the RJ45 port of the APC NetBotz sensor to your management VLAN.
+2. In the firmware, set the Trap destination to the IP of the governance server.
+3. The governance server will ingest physical rack health along with software compliance metrics.
 
 ---
 
-## Setup & Configuration
+## Simulation Code
 
-Start the backend server to listen for requests:
+If you do not have the physical hardware, you can run the software simulation layer to mock the data streams and verify the logic.
+
 ```bash
-cd projects/chief-information-officer/src
-npm install
-npm start
+cd projects/chief-information-officer/simulation
+node sim.js  # Or python sim.py
 ```

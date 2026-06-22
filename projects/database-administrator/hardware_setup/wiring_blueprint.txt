@@ -1,0 +1,5 @@
+## Physical Hardware Wiring & Setup
+This requires at least 3 physical bare-metal servers and a NAS array.
+1. Connect the NAS to the servers using a dedicated 10GbE SFP+ switch (Storage Area Network).
+2. Configure hardware RAID 10 on the NAS for redundancy.
+3. Ensure each server has dual redundant power supplies connected to separate UPS units.

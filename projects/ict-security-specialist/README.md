@@ -1,45 +1,26 @@
 # Zero-Trust Network Mesh (ICT Security Specialist)
 
-This is the absolute architectural blueprint of the **Zero-Trust Network Mesh (ICT Security Specialist)**.
+This is the architectural blueprint of the **Zero-Trust Network Mesh (ICT Security Specialist)**.
 
-A comprehensive zero-trust network architecture implementation. Includes mutual TLS, dynamic identity verification, and automated threat isolation protocols to secure internal microservices.
+A comprehensive zero-trust network architecture implementation.
 
-This project was built to explore the boundaries of enterprise architecture and modern software engineering. It showcases how developers can bridge complex business requirements with cutting-edge technology.
-
----
-
-## System Architecture
-
-The system operates as a decoupled architecture divided into computational layers:
-
-```
-[ Client Layer ]
-          │
-          ▼ 
-[ API Gateway / Load Balancer ]
-          │
-          ├──► [ Processing Services ]
-          │
-          ▼ 
-[ Persistent Storage / Database ]
-```
+This project bridges theoretical software engineering with physical hardware implementation, demonstrating real-world utility.
 
 ---
 
-## Real-World Utility (How It's Useful IRL)
-
-In commercial applications, this system allows for:
-1.  **High-Frequency Processing**: Reacting to data streams in real-time.
-2.  **Safety & Reliability**: Automated fallbacks and fault tolerance.
-3.  **Scalability**: Independent scaling of system components.
+## Physical Hardware Wiring & Setup
+Integrate a Hardware Security Module (HSM) such as a YubiHSM 2.
+1. Insert the YubiHSM 2 into the central authentication server USB port.
+2. Wire a physical biometric access panel (e.g., fingerprint scanner) to the entry gate using Wiegand protocol wiring.
+3. The proxy server will reject all network requests unless the physical biometric log matches the cryptographic token signed by the HSM.
 
 ---
 
-## Setup & Configuration
+## Simulation Code
 
-Start the backend server to listen for requests:
+If you do not have the physical hardware, you can run the software simulation layer to mock the data streams and verify the logic.
+
 ```bash
-cd projects/ict-security-specialist/src
-npm install
-npm start
+cd projects/ict-security-specialist/simulation
+node sim.js  # Or python sim.py
 ```

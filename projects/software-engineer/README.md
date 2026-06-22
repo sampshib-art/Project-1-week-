@@ -1,45 +1,26 @@
 # Micro-Frontend Architecture (Software Engineer)
 
-This is the absolute architectural blueprint of the **Micro-Frontend Architecture (Software Engineer)**.
+This is the architectural blueprint of the **Micro-Frontend Architecture (Software Engineer)**.
 
-A scalable web platform utilizing micro-frontend architecture. It allows multiple independent teams to build, test, and deploy frontend components without stepping on each others toes.
+A scalable web platform utilizing micro-frontend architecture.
 
-This project was built to explore the boundaries of enterprise architecture and modern software engineering. It showcases how developers can bridge complex business requirements with cutting-edge technology.
-
----
-
-## System Architecture
-
-The system operates as a decoupled architecture divided into computational layers:
-
-```
-[ Client Layer ]
-          │
-          ▼ 
-[ API Gateway / Load Balancer ]
-          │
-          ├──► [ Processing Services ]
-          │
-          ▼ 
-[ Persistent Storage / Database ]
-```
+This project bridges theoretical software engineering with physical hardware implementation, demonstrating real-world utility.
 
 ---
 
-## Real-World Utility (How It's Useful IRL)
-
-In commercial applications, this system allows for:
-1.  **High-Frequency Processing**: Reacting to data streams in real-time.
-2.  **Safety & Reliability**: Automated fallbacks and fault tolerance.
-3.  **Scalability**: Independent scaling of system components.
+## Physical Hardware Wiring & Setup
+Deploy Edge Node physical appliances (e.g., Intel NUCs) in geographically distributed office locations.
+1. Connect each NUC to the local office router.
+2. Flash the NUC with a minimal Linux Edge OS.
+3. These physical nodes act as local CDNs, caching and serving the micro-frontend JavaScript bundles directly to the local network to eliminate WAN latency.
 
 ---
 
-## Setup & Configuration
+## Simulation Code
 
-Start the backend server to listen for requests:
+If you do not have the physical hardware, you can run the software simulation layer to mock the data streams and verify the logic.
+
 ```bash
-cd projects/software-engineer/src
-npm install
-npm start
+cd projects/software-engineer/simulation
+node sim.js  # Or python sim.py
 ```

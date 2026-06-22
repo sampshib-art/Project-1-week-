@@ -1,0 +1,5 @@
+## Physical Hardware Wiring & Setup
+Connect physical SNMP environmental sensors (temperature/humidity) located in the server rack to the governance node.
+1. Wire the RJ45 port of the APC NetBotz sensor to your management VLAN.
+2. In the firmware, set the Trap destination to the IP of the governance server.
+3. The governance server will ingest physical rack health along with software compliance metrics.

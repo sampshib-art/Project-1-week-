@@ -1,0 +1,5 @@
+## Physical Hardware Wiring & Setup
+Deploy Edge Node physical appliances (e.g., Intel NUCs) in geographically distributed office locations.
+1. Connect each NUC to the local office router.
+2. Flash the NUC with a minimal Linux Edge OS.
+3. These physical nodes act as local CDNs, caching and serving the micro-frontend JavaScript bundles directly to the local network to eliminate WAN latency.
